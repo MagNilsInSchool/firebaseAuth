@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup, signOut, type User } from "firebase/auth";
+import { GoogleAuthProvider, GithubAuthProvider, getAuth, signInWithPopup, signOut, type User } from "firebase/auth";
 import { app } from "../../firebase/firebase.init";
 
 interface Props {
@@ -9,10 +9,11 @@ interface Props {
 const Login: React.FC<Props> = ({ user, setUser, setBeanQuote }) => {
     const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
+    const gitHubProvider = new GithubAuthProvider();
 
-    const handleGoogleSignIn = async () => {
+    const handleSignIn = async (provider: GoogleAuthProvider | GithubAuthProvider) => {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
+            const result = await signInWithPopup(auth, provider);
             const loggedInUser = result.user;
 
             const token = await loggedInUser.getIdToken(true);
@@ -36,6 +37,7 @@ const Login: React.FC<Props> = ({ user, setUser, setBeanQuote }) => {
             sessionStorage.removeItem("token");
             sessionStorage.removeItem("user");
             setUser(null);
+            setBeanQuote("");
         } catch (error) {
             if (error instanceof Error) {
                 console.error("Error during sign-in:", error.message);
@@ -56,8 +58,6 @@ const Login: React.FC<Props> = ({ user, setUser, setBeanQuote }) => {
 
             const token = await currentUser.getIdToken(true);
 
-            // sessionStorage.setItem("token", token);
-
             const response = await fetch("http://localhost:1338/secure-data", {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -74,17 +74,24 @@ const Login: React.FC<Props> = ({ user, setUser, setBeanQuote }) => {
             if (error instanceof Error) {
                 console.error("Error fetching data:", error.message);
             } else {
-                console.error(error);
+                console.error("Error fetching data:", error);
             }
         }
     };
     return user ? (
         <>
-            <button onClick={handleSignOut}>Sign out</button>
-            <button onClick={fetchSecureData}>Fetch data</button>
+            <button onClick={fetchSecureData} style={{ backgroundColor: "green" }}>
+                Fetch data
+            </button>
+            <button onClick={handleSignOut} style={{ backgroundColor: "red" }}>
+                Sign out
+            </button>
         </>
     ) : (
-        <button onClick={handleGoogleSignIn}>Google login</button>
+        <>
+            <button onClick={() => handleSignIn(googleProvider)}>Google login</button>
+            <button onClick={() => handleSignIn(gitHubProvider)}>GitHub login</button>
+        </>
     );
 };
 

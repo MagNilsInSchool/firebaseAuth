@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
-dotenv.config();
-
-import "./firebaseAdmin.ts";
 import express from "express";
 import cors from "cors";
+import admin from "firebase-admin";
 import { verifyToken } from "./middleware/auth.ts";
 import { beanPuns } from "./data.ts";
+
+dotenv.config();
+admin.initializeApp();
 
 const app = express();
 const PORT = 1338;

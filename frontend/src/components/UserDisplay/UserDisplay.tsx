@@ -5,6 +5,7 @@ interface Props {
     beanQuote: string;
 }
 const UserDisplay: React.FC<Props> = ({ user, beanQuote }) => {
+    const beanquote = beanQuote ? `- "${beanQuote}"` : "";
     return (
         <article>
             <div>
@@ -12,7 +13,7 @@ const UserDisplay: React.FC<Props> = ({ user, beanQuote }) => {
                 <h1>{user?.displayName}</h1>
                 <h2>{user?.email}</h2>
             </div>
-            <p>- "{beanQuote}"</p>
+            <p>{beanquote}</p>
         </article>
     );
 };
